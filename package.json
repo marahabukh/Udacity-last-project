@@ -1,0 +1,60 @@
+{
+  "name": "marah",
+  "version": "1.0.0",
+  "description": "Travel planning application for FEND Capstone project",
+  "main": "src/client/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "start": "node src/server/server.js",
+    "build": "webpack --config webpack.prod.js",
+    "dev": "webpack serve --config webpack.dev.js --open",
+    "lint": "eslint src/**/*.js",
+    "format": "prettier --write 'src/**/*.js'",
+    "cypress:open": "cypress open",
+    "test:e2e": "cypress run"
+  },
+  "keywords": ["travel", "weather", "planning", "udacity", "capstone"],
+  "author": "marahabukh",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-fetch": "^3.3.2",
+    "dotenv": "^10.0.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/plugin-transform-runtime": "^7.16.4",
+    "babel-loader": "^8.2.3",
+    "babel-jest": "^27.4.5",
+    "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^6.5.1",
+    "html-webpack-plugin": "^5.5.0",
+    "jest": "^27.5.1",
+    "mini-css-extract-plugin": "^2.4.5",
+    "sass": "^1.45.0",
+    "css-minimizer-webpack-plugin": "^3.0.2",
+    "sass-loader": "^12.4.0",
+    "style-loader": "^3.3.1",
+    "terser-webpack-plugin": "^5.2.5",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.6.0",
+    "workbox-webpack-plugin": "^6.4.2",
+    "eslint": "^8.4.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.3",
+    "prettier": "^2.5.1",
+    "cypress": "^9.1.1",
+    "supertest": "^6.1.6",
+    "regenerator-runtime": "^0.13.9",
+    "cross-env": "^7.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+

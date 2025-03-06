@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>marah</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css"> <!-- Assuming the styles are in a separate file -->
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="header__title">marah</h1>
+        </header>
+
+        <main class="main-content">
+            <!-- Trip Form Section -->
+            <section class="trip-form">
+                <h2 class="trip-form__title">Plan Your Trip</h2>
+                <form id="travel-form" class="travel-form" aria-labelledby="trip-form-title">
+                    <div class="form-group">
+                        <label for="city" class="form-label">Destination:</label>
+                        <input type="text" id="city" name="city" class="form-input" placeholder="Enter destination city" required aria-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="departure" class="form-label">Departure Date:</label>
+                        <input type="date" id="departure" name="departure" class="form-input" required aria-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="return" class="form-label">Return Date:</label>
+                        <input type="date" id="return" name="return" class="form-input" required aria-required="true">
+                    </div>
+                    <button type="submit" id="submit" class="submit-btn">Plan My Trip</button>
+                </form>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results" class="trip-results" aria-live="polite">
+                <!-- Results will be dynamically inserted here -->
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p class="footer__text">marah.</p>
+        </footer>
+    </div>
+</body>
+</html>
