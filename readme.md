@@ -29,7 +29,7 @@ This project integrates with three external APIs:
 
 ### Prerequisites
 Ensure you have the following installed:
-- **Node.js** (v14.0.0 or higher)
+- **Node.js** (v18.0 or higher, recommended v20+)
 - **npm** (included with Node.js)
 - **API keys** for Geonames, Weatherbit, and Pixabay
 
