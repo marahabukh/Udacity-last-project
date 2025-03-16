@@ -29,7 +29,7 @@ This project integrates with three external APIs:
 
 ### Prerequisites
 Ensure you have the following installed:
-- **Node.js** (v18.0 or higher, recommended v20+)
+- **Node.js** (v18.0 or higher)
 - **npm** (included with Node.js)
 - **API keys** for Geonames, Weatherbit, and Pixabay
 
@@ -75,8 +75,4 @@ npm run test
 
 ## License
 This project is licensed under the MIT License.
-
----
-
-Feel free to modify as needed! 🚀
 
