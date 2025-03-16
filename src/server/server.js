@@ -6,8 +6,10 @@ import fetch from "node-fetch"
 import path from "path"
 import { fileURLToPath } from "url"
 
+// Configure environment variables
 dotenv.config()
 
+// Setup directory paths for ES modules
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -17,26 +19,52 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors())
-app.use(express.static("dist"))
+
+// Serve static files from dist folder
+app.use(express.static(path.join(__dirname, "../../dist")))
 
 // API keys
 const GEONAMES_USERNAME = process.env.GEONAMES_USERNAME
 const WEATHERBIT_API_KEY = process.env.WEATHERBIT_API_KEY
 const PIXABAY_API_KEY = process.env.PIXABAY_API_KEY
 
-// Test route
-app.get("/test", (req, res) => {
-  res.status(200).json({ message: "Test route working" })
-})
+// Validate API keys
+if (!GEONAMES_USERNAME || !WEATHERBIT_API_KEY || !PIXABAY_API_KEY) {
+  console.error("ERROR: Missing API keys. Please check your .env file.")
+  console.error(`GEONAMES_USERNAME: ${GEONAMES_USERNAME ? "Set" : "Missing"}`)
+  console.error(`WEATHERBIT_API_KEY: ${WEATHERBIT_API_KEY ? "Set" : "Missing"}`)
+  console.error(`PIXABAY_API_KEY: ${PIXABAY_API_KEY ? "Set" : "Missing"}`)
+}
 
 // Geonames API endpoint
 app.get("/geo", async (req, res) => {
   try {
     const { city } = req.query
-    const response = await fetch(
-      `http://api.geonames.org/searchJSON?q=${encodeURIComponent(city)}&maxRows=1&username=${GEONAMES_USERNAME}`,
-    )
+    if (!city) {
+      return res.status(400).json({
+        success: false,
+        error: "City parameter is required",
+      })
+    }
+
+    console.log(`Fetching geo data for: ${city}`)
+    console.log(`Using Geonames username: ${GEONAMES_USERNAME}`)
+
+    const geonamesUrl = `http://api.geonames.org/searchJSON?q=${encodeURIComponent(city)}&maxRows=1&username=${GEONAMES_USERNAME}`
+    console.log(`Geonames URL: ${geonamesUrl}`)
+
+    const response = await fetch(geonamesUrl)
+
+    if (!response.ok) {
+      console.error(`Geonames API error: ${response.status} ${response.statusText}`)
+      return res.status(response.status).json({
+        success: false,
+        error: `Geonames API error: ${response.status} ${response.statusText}`,
+      })
+    }
+
     const data = await response.json()
+    console.log("Geonames response:", data)
 
     if (data.geonames && data.geonames.length > 0) {
       res.json({
@@ -50,7 +78,8 @@ app.get("/geo", async (req, res) => {
       })
     }
   } catch (error) {
-    res.json({
+    console.error("Geonames API error:", error)
+    res.status(500).json({
       success: false,
       error: error.message,
     })
@@ -61,15 +90,30 @@ app.get("/geo", async (req, res) => {
 app.get("/weather", async (req, res) => {
   try {
     const { lat, lon } = req.query
+    if (!lat || !lon) {
+      return res.status(400).json({
+        success: false,
+        error: "Latitude and longitude parameters are required",
+      })
+    }
+
     const response = await fetch(
       `https://api.weatherbit.io/v2.0/forecast/daily?lat=${lat}&lon=${lon}&key=${WEATHERBIT_API_KEY}`,
     )
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        success: false,
+        error: `Weatherbit API error: ${response.status} ${response.statusText}`,
+      })
+    }
+
     const data = await response.json()
 
-    if (data.data) {
+    if (data.data && data.data.length > 0) {
       res.json({
         success: true,
-        data: data.data,
+        data: data.data[0],
       })
     } else {
       res.json({
@@ -78,7 +122,8 @@ app.get("/weather", async (req, res) => {
       })
     }
   } catch (error) {
-    res.json({
+    console.error("Weatherbit API error:", error)
+    res.status(500).json({
       success: false,
       error: error.message,
     })
@@ -89,35 +134,71 @@ app.get("/weather", async (req, res) => {
 app.get("/image", async (req, res) => {
   try {
     const { city } = req.query
+    if (!city) {
+      return res.status(400).json({
+        success: false,
+        error: "City parameter is required",
+      })
+    }
+
     const response = await fetch(
       `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(city)}+city&image_type=photo`,
     )
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        success: false,
+        error: `Pixabay API error: ${response.status} ${response.statusText}`,
+      })
+    }
+
     const data = await response.json()
 
     if (data.hits && data.hits.length > 0) {
       res.json({
         success: true,
-        hits: data.hits,
+        url: data.hits[0].webformatURL,
       })
     } else {
-      res.json({
-        success: false,
-        error: "No image found",
-      })
+      // Try searching for the country instead
+      const countryResponse = await fetch(
+        `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=landscape&image_type=photo`,
+      )
+      const countryData = await countryResponse.json()
+
+      if (countryData.hits && countryData.hits.length > 0) {
+        res.json({
+          success: true,
+          url: countryData.hits[0].webformatURL,
+        })
+      } else {
+        res.json({
+          success: false,
+          error: "No image found",
+        })
+      }
     }
   } catch (error) {
-    res.json({
+    console.error("Pixabay API error:", error)
+    res.status(500).json({
       success: false,
       error: error.message,
     })
   }
 })
 
+// Serve index.html for all routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../dist/index.html"))
+})
+
 // Setup Server
 const port = process.env.PORT || 3000
 let server
+
 if (process.env.NODE_ENV !== "test") {
   server = app.listen(port, () => console.log(`Server running on port ${port}`))
 }
 
 export { app, server }
+

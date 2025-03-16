@@ -1,28 +1,41 @@
-import path, { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
-import HtmlWebpackPlugin from "html-webpack-plugin";
-import { CleanWebpackPlugin } from "clean-webpack-plugin";
+import path from "path"
+import HtmlWebPackPlugin from "html-webpack-plugin"
+import { CleanWebpackPlugin } from "clean-webpack-plugin"
+import { fileURLToPath } from "url"
 
-const currentFile = fileURLToPath(import.meta.url);
-const rootDir = dirname(currentFile);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default {
   mode: "development",
-  entry: "./src/client/main.js",
+  entry: "./src/client/index.js",
   output: {
-    filename: "app.bundle.js",
-    path: resolve(rootDir, "public"),
-    library: "MainApp",
     libraryTarget: "var",
+    library: "Client",
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.js",
+  },
+  devServer: {
+    static: {
+      directory: path.join(__dirname, "dist"),
+    },
+    port: 8080,
+    proxy: {
+      "/geo": "http://localhost:3000",
+      "/weather": "http://localhost:3000",
+      "/image": "http://localhost:3000",
+    },
   },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "babel-loader",
-        options: {
-          presets: ["@babel/preset-env"],
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+          },
         },
       },
       {
@@ -32,15 +45,16 @@ export default {
     ],
   },
   plugins: [
-    new CleanWebpackPlugin({
-      dry: false,
-      verbose: true,
-      cleanStaleWebpackAssets: false,
-      protectWebpackAssets: true,
+    new HtmlWebPackPlugin({
+      template: "./src/client/views/index.html",
+      filename: "./index.html",
     }),
-    new HtmlWebpackPlugin({
-      template: "./src/client/templates/main.html",
-      filename: "index.html",
+    new CleanWebpackPlugin({
+      dry: true,
+      verbose: true,
+      cleanStaleWebpackAssets: true,
+      protectWebpackAssets: false,
     }),
   ],
-};
+}
+
